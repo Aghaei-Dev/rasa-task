@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+/* @import './font.css'; you can also use static fonts! like this i didnt remove thar*/
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap');
+:root {
+  --max-width: 1270px;
+}
+
+* {
+  direction: rtl;
+}
+html,
+body {
+  margin: auto;
+}
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 1rem;
+}
+.fixed-width {
+  margin: 0 auto;
+  max-width: var(--max-width);
+  overflow-x: hidden;
+}
+@media screen and (width <= 1270px) {
+  .fixed-width {
+    max-width: 95vw;
+  }
+}
+
+.fixed-center {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -90%);
+}
