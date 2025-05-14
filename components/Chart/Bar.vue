@@ -1,6 +1,6 @@
 <script setup>
 import { ref, shallowRef, onMounted, onBeforeUnmount } from 'vue'
-
+import { toPersianNumber } from '~/utils'
 const chart = ref(null)
 
 function random() {
@@ -11,11 +11,24 @@ const option = shallowRef({
   animation: true,
   tooltip: {
     className: 'echarts-tooltip',
+    formatter: (params) => `${params.data.day}: ${toPersianNumber(params.data['view'])}`,
   },
   toolbox: {
     show: true,
     feature: {
-      saveAsImage: {},
+      saveAsImage: {
+        title: 'ذخیره تصویر',
+        type: 'png',
+        pixelRatio: 2,
+        backgroundColor: '#fff',
+      },
+      dataView: {
+        title: 'مشاهده داده‌ها',
+        readOnly: false,
+      },
+      restore: {
+        title: 'بازگشت به حالت اولیه',
+      },
     },
   },
   dataset: {
@@ -31,9 +44,19 @@ const option = shallowRef({
     ],
   },
   xAxis: { type: 'category' },
-  yAxis: {},
-  itemStyle: { borderRadius: 3 },
-  series: [{ type: 'bar' }],
+  yAxis: {
+    axisLabel: {
+      formatter: (value) => toPersianNumber(value),
+    },
+  },
+  series: [
+    {
+      type: 'bar',
+      itemStyle: {
+        borderRadius: [8, 8, 0, 0],
+      },
+    },
+  ],
 })
 
 function resizeChart() {

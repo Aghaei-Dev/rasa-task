@@ -29,7 +29,7 @@ export default defineNuxtConfig({
     features: ['LabelLayout', 'UniversalTransition'],
   },
   pwa: {
-    registerType: 'autoUpdate', // auto updates service worker
+    registerType: 'autoUpdate',
     manifest: {
       name: 'Rasa Task App',
       short_name: 'Rasa App',
