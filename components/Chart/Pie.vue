@@ -21,14 +21,6 @@ const option = shallowRef({
     className: 'echarts-tooltip',
     formatter: (params) => `${params.name}: ${toPersianNumber(params.value)} بازدید`,
   },
-  legend: {
-    orient: 'vertical',
-    left: 'right',
-    top: 'center',
-    textStyle: {
-      fontSize: 14,
-    },
-  },
 
   toolbox: {
     show: true,

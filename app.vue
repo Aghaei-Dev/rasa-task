@@ -6,8 +6,8 @@
     <NuxtLayout>
       <NuxtPage />
       <Overlay
-        :condition="isSidebarOpen"
-        :close-fn="toggle"
+        :condition="isShowOverlay"
+        :close-fn="closeOverlay"
       />
       <Toast />
     </NuxtLayout>
@@ -17,6 +17,6 @@
 import Toast from './components/UI/Toast.vue'
 
 const store = useGlobalStore()
-const { toggle } = store
-const { isSidebarOpen } = storeToRefs(store)
+const { closeOverlay } = store
+const { isShowOverlay } = storeToRefs(store)
 </script>
