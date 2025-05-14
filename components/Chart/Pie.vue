@@ -1,63 +1,102 @@
-<script setup lang="ts">
-import type { ECSSRClientEventParams } from 'echarts/ssr/client/index'
+<script setup>
+import { ref, shallowRef, onMounted, onBeforeUnmount } from 'vue'
+import { toPersianNumber } from '~/utils'
 
-const option = ref({
+const chart = ref(null)
+
+const countries = ['ایران', 'آمریکا', 'ترکیه', 'آلمان', 'امارات', 'عراق', 'فرانسه']
+
+function generateRandomData() {
+  return countries.map((name) => ({
+    name,
+    value: Math.floor(400 + Math.random() * 700),
+  }))
+}
+const option = shallowRef({
+  animation: true,
+  animationDuration: 1000,
+  animationEasing: 'cubicOut',
+  tooltip: {
+    trigger: 'item',
+    className: 'echarts-tooltip',
+    formatter: (params) => `${params.name}: ${toPersianNumber(params.value)} بازدید`,
+  },
   legend: {
-    top: '1%',
-    left: 'center',
-    selected: {
-      آمریکا: true,
-      ایران: true,
-      ترکیه: true,
-      امارات: true,
-      آلمان: true,
+    orient: 'vertical',
+    left: 'right',
+    top: 'center',
+    textStyle: {
+      fontSize: 14,
     },
   },
-  tooltip: {
-    className: 'echarts-tooltip',
-  },
+
   toolbox: {
     show: true,
     feature: {
-      saveAsImage: {},
+      saveAsImage: {
+        title: 'ذخیره تصویر',
+        type: 'png',
+        pixelRatio: 2,
+        backgroundColor: '#fff',
+      },
+      dataView: {
+        title: 'مشاهده داده‌ها',
+        readOnly: false,
+      },
+      restore: {
+        title: 'بازگشت به حالت اولیه',
+      },
     },
   },
-  animation: false,
-
   series: [
     {
-      name: 'View By Country',
       type: 'pie',
-      radius: ['30%', '70%'],
-      // roseType: 'angle',
-      itemStyle: {
-        // borderRadius: [20, 5, 5, 10],
-      },
+      radius: ['35%', '80%'],
+      avoidLabelOverlap: true,
       label: {
         show: true,
+        position: 'inside',
+        formatter: ({ name, value }) => `${name}\n${toPersianNumber(value)}`,
+        fontSize: 14,
       },
-      data: [
-        { value: 800, name: 'آمریکا' },
-        { value: 735, name: 'ایران' },
-        { value: 580, name: 'ترکیه' },
-        { value: 484, name: 'امارات' },
-        { value: 400, name: 'آلمان' },
-      ],
+      labelLine: {
+        show: true,
+      },
+      emphasis: {
+        scale: true,
+        scaleSize: 14,
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)',
+        },
+      },
+      data: generateRandomData(),
     },
   ],
 })
 
-function onClick(params: ECSSRClientEventParams) {
-  if (params.ssrType === 'legend') {
-    const key = Object.keys(option.value.legend.selected)[params.dataIndex!] as keyof typeof option.value.legend.selected
-    option.value.legend.selected[key] = !option.value.legend.selected[key]
-  }
+function resizeChart() {
+  chart.value?.resize()
 }
+
+onMounted(() => {
+  window.addEventListener('resize', resizeChart)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', resizeChart)
+})
 </script>
 
 <template>
-  <VChartLight
-    :option="option"
-    @click="onClick"
-  />
+  <div class="w-full h-[300px] sm:h-[400px]">
+    <ClientOnly>
+      <VChart
+        ref="chart"
+        :option="option"
+        autoresize
+        class="w-full h-full"
+      />
+    </ClientOnly>
+  </div>
 </template>
