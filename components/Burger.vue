@@ -5,7 +5,7 @@
         class="hidden peer"
         type="checkbox"
         :checked="isSidebarOpen"
-        @change="toggle"
+        @change="toggleSidebar"
       />
       <div
         class="w-[50%] h-[2px] bg-black rounded-sm transition-all duration-300 origin-left translate-y-[0.45rem] peer-checked:rotate-[-45deg] peer-checked:bg-white"
@@ -23,6 +23,6 @@ import { useGlobalStore } from '@/stores/global'
 import { storeToRefs } from 'pinia'
 
 const store = useGlobalStore()
-const { toggle } = store
+const { toggleSidebar } = store
 const { isSidebarOpen } = storeToRefs(store)
 </script>

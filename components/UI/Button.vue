@@ -25,7 +25,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  block: {
+  full: {
     type: Boolean,
     default: false,
   },
@@ -57,7 +57,7 @@ const variantClasses = {
       sizeClasses[size],
       variantClasses[variant],
       rounded ? 'rounded-full' : 'rounded-md',
-      block ? 'w-full' : '',
+      full ? 'w-full' : '',
       customClass,
       disabled ? 'bg-gray-400 cursor-not-allowed hover:translate-none hover:bg-gray-500' : '',
     ]"

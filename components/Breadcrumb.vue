@@ -1,5 +1,5 @@
 <template>
-  <nav class="text-sm text-black/70 fixed-width px-4 py-2 font-semibold">
+  <nav class="text-sm text-black/70 fixed-width px-4 py-4 font-semibold">
     <ol class="flex items-center">
       <li
         v-for="(crumb, index) in breadcrumbs"

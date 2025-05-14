@@ -28,15 +28,17 @@
 
     <CircleButton
       :icon="ChevronLeft"
+      :iconClass="'stroke-blue-700 hover:stroke-blue-800'"
       size="md"
       @click="handleNext"
-      class="absolute top-1/2 left-4 transform -translate-y-1/2 shadow"
+      class="absolute top-1/2 left-4 transform -translate-y-1/2 shadow bg-blue-100 hover:bg-blue-200"
     />
     <CircleButton
       :icon="ChevronRight"
+      :iconClass="'stroke-blue-700 hover:stroke-blue-800'"
       size="md"
       @click="handlePrev"
-      class="absolute top-1/2 right-4 transform -translate-y-1/2 shadow"
+      class="absolute top-1/2 right-4 transform -translate-y-1/2 shadow bg-blue-100 hover:bg-blue-200"
     />
     <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
       <button

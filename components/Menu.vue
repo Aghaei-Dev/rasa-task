@@ -8,7 +8,7 @@
     <li
       v-for="item in props.array"
       :key="item.to"
-      @click="close"
+      @click="closeSidebar"
     >
       <NuxtLink
         :to="item.to"
@@ -33,7 +33,7 @@ const props = defineProps({
   dir: { type: String },
 })
 const store = useGlobalStore()
-const { close } = store
+const { closeSidebar } = store
 const { isSidebarOpen } = storeToRefs(store)
 
 const route = useRoute()

@@ -1,25 +1,34 @@
 <template>
-  <!-- <div>
-    <h1 class="">Posts</h1>
-    <button @click="fetchPosts">Load Posts</button>
+  <Button @click="openConfirm">Open Confirm Modal</Button>
+  <Button @click="openContent">Open Content Modal</Button>
 
-    <div v-if="loading">Loading...</div>
-    <div v-if="error">❌ Error: {{ error.message }}</div>
-
-    <ul v-if="!loading">
-      <li
-        v-for="post in posts"
-        :key="post.id"
-      >
-        <strong>{{ post.title }}</strong>
-        <p>{{ post.body }}</p>
-      </li>
-    </ul>
-  </div> -->
+  <Modal>
+    <p>برگشت پذیر نیست.</p>
+  </Modal>
 </template>
 
 <script setup>
-// const { posts, fetchPosts, loading, error } = usePostsStore()
+import { useGlobalStore } from '~/stores/global'
+import Modal from '~/components/UI/Modal.vue'
+import Button from '~/components/UI/Button.vue'
+const globalStore = useGlobalStore()
+
+function openConfirm() {
+  globalStore.showModal({
+    type: 'confirm',
+    title: 'آیا مطمئنی؟',
+
+    onConfirm: () => alert('Confirmed!'),
+    onCancel: () => alert('Cancelled.'),
+  })
+}
+
+function openContent() {
+  globalStore.showModal({
+    type: 'content',
+    title: 'Modal Info',
+  })
+}
 useHead({
   title: 'رسا سامانه | پست ها',
   meta: [{ name: 'description', content: 'My amazing site.' }],
