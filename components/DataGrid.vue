@@ -191,19 +191,16 @@ const filteredAndSortedData = computed(() => {
   let filtered = props.data ?? []
   const s = search.value.toLowerCase()
 
-  // فیلتر کلی
   if (s) {
     filtered = filtered.filter((row) => Object.values(row).some((v) => String(v).toLowerCase().includes(s)))
   }
 
-  // فیلتر ستونی
   Object.entries(filters.value).forEach(([key, value]) => {
     if (value) {
       filtered = filtered.filter((row) => String(row[key]).toLowerCase().includes(value.toLowerCase()))
     }
   })
 
-  // مرتب‌سازی
   if (sortKey.value) {
     filtered = [...filtered].sort((a, b) => {
       const valA = String(a[sortKey.value])
@@ -239,7 +236,6 @@ const nextPage = () => {
   if (currentPage.value < totalPages.value) currentPage.value++
 }
 
-// خروجی گرفتن
 const { downloadJSON, downloadExcel } = useDownload()
 const exportJSON = () => {
   toast.showToast('دریافت فایل با موفقیت انجام شد.', 'success')

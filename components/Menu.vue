@@ -2,7 +2,7 @@
   <ul
     :class="[
       'sm:flex gap-4 p-2 flex-row text-md font-bold',
-      isSidebarOpen ? 'flex-col z-50 fixed-center text-center text-4xl leading-20' : 'hidden',
+      isSidebarOpen ? 'flex-col z-50 fixed-up text-center text-4xl leading-20' : 'hidden',
     ]"
   >
     <li

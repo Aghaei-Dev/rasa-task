@@ -15,6 +15,7 @@ export const useGlobalStore = defineStore('global', {
     modalState: {
       isVisible: false,
       type: 'content',
+      content: '',
       title: '',
       confirmText: '',
       cancelText: '',
@@ -80,6 +81,7 @@ export const useGlobalStore = defineStore('global', {
         cancelText: options.cancelText || 'لغو',
         onConfirm: options.onConfirm || null,
         onCancel: options.onCancel || null,
+        content: options.content || '',
       }
     },
     closeModal() {

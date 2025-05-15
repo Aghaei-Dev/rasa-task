@@ -4,12 +4,19 @@
     :data="postStore.posts"
     @view="showComments"
     @edit="editPost"
-    @delete="confirmDelete"
+    @delete="deletePostHandler"
     :itemsPerPage="10"
     :items="postStore.posts"
   />
   <Modal>
-    <p>برگشت پذیر نیست.</p>
+    <PostForm
+      :postData="postStore.editPostData"
+      v-if="postStore.editPostData"
+    />
+    <Comments
+      v-else
+      :comments="postStore.comments"
+    />
   </Modal>
 </template>
 
@@ -17,6 +24,8 @@
 import DataGrid from '@/components/DataGrid.vue'
 import { usePostStore } from '@/stores/posts'
 import Modal from '~/components/UI/Modal.vue'
+import { toPersianNumber } from '../utils'
+import PostForm from '~/components/PostForm.vue'
 
 const globalStore = useGlobalStore()
 const postStore = usePostStore()
@@ -26,25 +35,32 @@ const columns = [
   { label: 'عنوان', key: 'title' },
   { label: 'متن', key: 'body' },
 ]
-const showComments = (post) => {
-  // مدال نمایش نظرات باز کن
+const showComments = async (post) => {
+  postStore.editPostData = null
+  await postStore.fetchComments(post.id)
+  globalStore.showModal({
+    type: 'content',
+    title: `کامنت های پست با آیدی ${toPersianNumber(post.id)}`,
+  })
 }
 const editPost = (post) => {
   globalStore.showModal({
     type: 'content',
-    title: 'Modal Info',
+    title: `ویرایش پست با آیدی ${toPersianNumber(post.id)}`,
   })
-  console.log(post)
+  postStore.setEditPostData(post)
 }
-const confirmDelete = (post) => {
+const deletePostHandler = (post) => {
   globalStore.showModal({
     type: 'confirm',
-    title: 'آیا مطمئنی؟',
-
-    onConfirm: () => alert('Confirmed!'),
-    onCancel: () => alert('Cancelled.'),
+    title: `آیا از حذف پست با آیدی ${toPersianNumber(post.id)} مطمئنی؟`,
+    content: `<h1 class='text-red-500'>عنوان : ${post.title} حذف خواهد شد.</h1>`,
+    onConfirm: () => {
+      postStore.deletePost(post.id)
+      globalStore.showToast('حذف پست با موفقیت انجام شد.', 'success')
+    },
+    onCancel: () => globalStore.closeModal(),
   })
-  console.log(post)
 }
 useHead({
   title: 'رسا سامانه | پست ها',

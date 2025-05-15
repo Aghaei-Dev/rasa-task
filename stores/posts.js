@@ -7,9 +7,13 @@ export const usePostStore = defineStore('post', {
     selectedPost: null,
     isLoading: false,
     error: null,
+    editPostData: {},
   }),
 
   actions: {
+    setEditPostData(post) {
+      this.editPostData = post
+    },
     async submitPost(payload) {
       this.isLoading = true
       const toast = useGlobalStore()
@@ -24,7 +28,8 @@ export const usePostStore = defineStore('post', {
       }
     },
     async fetchPosts() {
-      this.loading = true
+      this.isLoading = true
+      const toast = useGlobalStore()
       try {
         const response = await api.get('/posts')
         this.posts = response.data
@@ -33,10 +38,11 @@ export const usePostStore = defineStore('post', {
         toast.showToast('دریافت پست با خطا مواجه شد.', 'error')
         console.log(this.error)
       } finally {
-        this.loading = false
+        this.isLoading = false
       }
     },
     async fetchComments(postId) {
+      this.isLoading = true
       try {
         const response = await api.get('/comments', {
           params: { postId },
@@ -44,10 +50,22 @@ export const usePostStore = defineStore('post', {
         this.comments = response.data
       } catch (error) {
         this.error = error
+      } finally {
+        this.isLoading = false
       }
     },
     async updatePost(post) {
-      await api.put(`/posts/${post.id}`, post)
+      this.isLoading = true
+      const toast = useGlobalStore()
+      try {
+        await api.put(`/posts/${post.id}`, post)
+        toast.showToast('پست با موفقیت ویرایش شد!', 'success')
+      } catch (error) {
+        toast.showToast('ویرایش پست با خطا مواجه شد.', 'error')
+      } finally {
+        this.isLoading = false
+        toast.closeModal()
+      }
     },
     async deletePost(postId) {
       await api.delete(`/posts/${postId}`)

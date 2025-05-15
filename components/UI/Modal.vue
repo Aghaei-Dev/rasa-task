@@ -5,8 +5,8 @@
   >
     <div
       v-if="modalState.isVisible"
-      class="bg-gray-50 fixed-center z-50 rounded-md max-w-lg w-full transition-all duration-300"
-      :class="modalState.type === 'confirm' ? 'p-6' : 'p-4'"
+      class="bg-gray-50 z-50 rounded-md min-w-lg transition-all duration-300"
+      :class="modalState.type === 'confirm' ? 'p-6 fixed-up' : 'p-4 fixed-center'"
     >
       <CircleButton
         :icon="Close"
@@ -22,13 +22,14 @@
         {{ modalState.title }}
       </h3>
 
-      <div class="mb-4">
-        <slot />
-      </div>
-
+      <section
+        v-if="modalState.content"
+        v-html="modalState.content"
+      />
+      <section v-else><slot /></section>
       <div
         v-if="modalState.type === 'confirm'"
-        class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700"
+        class="flex justify-end gap-3 pt-4 border-gray-200 dark:border-gray-700"
       >
         <Button
           @click="handleCancel"
