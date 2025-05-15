@@ -1,19 +1,42 @@
 <template>
-  <Button @click="openConfirm">Open Confirm Modal</Button>
-  <Button @click="openContent">Open Content Modal</Button>
-
+  <DataGrid
+    :columns="columns"
+    :data="postStore.posts"
+    @view="showComments"
+    @edit="editPost"
+    @delete="confirmDelete"
+    :itemsPerPage="10"
+    :items="postStore.posts"
+  />
   <Modal>
     <p>برگشت پذیر نیست.</p>
   </Modal>
 </template>
 
 <script setup>
-import { useGlobalStore } from '~/stores/global'
+import DataGrid from '@/components/DataGrid.vue'
+import { usePostStore } from '@/stores/posts'
 import Modal from '~/components/UI/Modal.vue'
-import Button from '~/components/UI/Button.vue'
-const globalStore = useGlobalStore()
 
-function openConfirm() {
+const globalStore = useGlobalStore()
+const postStore = usePostStore()
+await postStore.fetchPosts()
+
+const columns = [
+  { label: 'عنوان', key: 'title' },
+  { label: 'متن', key: 'body' },
+]
+const showComments = (post) => {
+  // مدال نمایش نظرات باز کن
+}
+const editPost = (post) => {
+  globalStore.showModal({
+    type: 'content',
+    title: 'Modal Info',
+  })
+  console.log(post)
+}
+const confirmDelete = (post) => {
   globalStore.showModal({
     type: 'confirm',
     title: 'آیا مطمئنی؟',
@@ -21,13 +44,7 @@ function openConfirm() {
     onConfirm: () => alert('Confirmed!'),
     onCancel: () => alert('Cancelled.'),
   })
-}
-
-function openContent() {
-  globalStore.showModal({
-    type: 'content',
-    title: 'Modal Info',
-  })
+  console.log(post)
 }
 useHead({
   title: 'رسا سامانه | پست ها',

@@ -4,7 +4,7 @@
       <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">ثبت پست جدید</h2>
 
       <form
-        class="flex flex-col"
+        class="flex flex-col gap-4"
         @submit.prevent="submit"
       >
         <InputField
@@ -24,10 +24,10 @@
         />
         <Button
           type="submit"
-          class="w-full py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition"
+          class="w-full rounded bg-blue-500 text-white hover:bg-blue-600 transition"
           :disabled="hasError"
         >
-          {{ postsStore.loading ? 'در حال ارسال...' : 'ارسال پست' }}
+          {{ postsStore.isLoading ? 'در حال ارسال...' : 'ارسال پست' }}
         </Button>
       </form>
     </div>
