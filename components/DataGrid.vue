@@ -1,0 +1,257 @@
+<template>
+  <div class="py-4 px-2 fixed-width overflow-auto">
+    <!-- جستجو و دکمه‌های خروجی -->
+    <section class="flex-col gap-2 flex sm:flex-row items-center justify-between mb-2">
+      <InputField
+        type="text"
+        placeholder="جستجو..."
+        v-model="search"
+        class="w-full sm:max-w-[400px]"
+      />
+      <div class="flex gap-2 w-full sm:max-w-[250px]">
+        <Button
+          @click="exportJSON"
+          full
+          >دانلود JSON</Button
+        >
+        <Button
+          @click="exportExcel"
+          class="bg-green-500 hover:bg-green-600"
+          full
+        >
+          دانلود Excel
+        </Button>
+      </div>
+    </section>
+
+    <!-- جدول -->
+    <div class="overflow-auto">
+      <table class="w-full border border-collapse table-fixed">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="p-2 w-[40px]">
+              <input
+                type="checkbox"
+                @change="toggleAll"
+                :checked="isAllSelected"
+              />
+            </th>
+            <th class="p-2 min-w-[60px] w-[60px]">ردیف</th>
+            <th
+              v-for="col in columns"
+              :key="col.key"
+              class="p-2 cursor-pointer select-none min-w-[120px] resize-x overflow-hidden"
+            >
+              <section class="bg-blue-500 flex gap-5">
+                <div
+                  class="flex justify-between items-center gap-2 bg-teal-400"
+                  @click="toggleSort(col.key)"
+                >
+                  <span>{{ col.label }}</span>
+                  <span v-if="sortKey === col.key">
+                    <Ascend v-if="sortOrder === 'asc'" />
+                    <Descend v-else />
+                  </span>
+                </div>
+                <InputField
+                  v-model="filters[col.key]"
+                  class="w-full border border-gray-300 rounded px-1 py-0.5 text-sm"
+                  placeholder="فیلتر"
+                />
+              </section>
+            </th>
+            <th class="p-2 min-w-[120px]">عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(row, index) in paginatedData"
+            :key="row.id"
+            class="hover:bg-gray-50 border-b border-gray-200"
+          >
+            <td class="p-2 text-center">
+              <input
+                type="checkbox"
+                :value="row.id"
+                v-model="selected"
+              />
+            </td>
+            <td class="p-2 text-center">
+              {{ toPersianNumber(index + 1 + (currentPage - 1) * props.itemsPerPage) }}
+            </td>
+            <td
+              v-for="col in columns"
+              :key="col.key"
+              class="p-2 break-words"
+            >
+              {{ row[col.key] }}
+            </td>
+            <td class="p-2">
+              <button
+                @click="$emit('view', row)"
+                class="text-blue-500"
+              >
+                نمایش
+              </button>
+              <button
+                @click="$emit('edit', row)"
+                class="text-yellow-500 ml-2"
+              >
+                ویرایش
+              </button>
+              <button
+                @click="$emit('delete', row)"
+                class="text-red-500 ml-2"
+              >
+                حذف
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- صفحه‌بندی -->
+    <div class="flex justify-center items-center gap-2 mt-4">
+      <CircleButton
+        :disabled="currentPage === 1"
+        :icon="ChevronRight"
+        :iconClass="'stroke-blue-700 hover:stroke-blue-800'"
+        @click="prevPage"
+        class="shadow bg-blue-100 hover:bg-blue-200"
+      />
+      <CircleButton
+        v-for="page in totalPages"
+        :key="page"
+        @click="currentPage = page"
+        :class="['', page === currentPage ? 'bg-blue-500 text-white' : 'hover:bg-gray-100']"
+      >
+        {{ toPersianNumber(page) }}
+      </CircleButton>
+      <CircleButton
+        :disabled="currentPage === totalPages"
+        :icon="ChevronLeft"
+        :iconClass="'stroke-blue-700 hover:stroke-blue-800'"
+        @click="nextPage"
+        class="shadow bg-blue-100 hover:bg-blue-200"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { useDownload } from '@/composables/useDownload'
+import Button from './UI/Button.vue'
+import InputField from './UI/InputField.vue'
+import CircleButton from './UI/CircleButton.vue'
+import ChevronRight from '~/assets/icons/ChevronRight.vue'
+import ChevronLeft from '~/assets/icons/ChevronLeft.vue'
+import Ascend from '~/assets/icons/Ascend.vue'
+import Descend from '~/assets/icons/Descend.vue'
+
+const props = defineProps({
+  columns: Array,
+  data: Array,
+  itemsPerPage: {
+    type: Number,
+    default: 10,
+  },
+})
+
+const toast = useGlobalStore()
+
+const search = ref('')
+const sortKey = ref('')
+const sortOrder = ref('asc')
+const filters = ref({})
+const selected = ref([])
+const currentPage = ref(1)
+
+const isAllSelected = computed(() => {
+  return paginatedData.value.length && selected.value.length === paginatedData.value.length
+})
+
+const toggleAll = () => {
+  selected.value = isAllSelected.value ? [] : paginatedData.value.map((r) => r.id)
+}
+
+const toggleSort = (key) => {
+  if (sortKey.value === key) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKey.value = key
+    sortOrder.value = 'asc'
+  }
+}
+
+const filteredAndSortedData = computed(() => {
+  let filtered = props.data ?? []
+  const s = search.value.toLowerCase()
+
+  // فیلتر کلی
+  if (s) {
+    filtered = filtered.filter((row) => Object.values(row).some((v) => String(v).toLowerCase().includes(s)))
+  }
+
+  // فیلتر ستونی
+  Object.entries(filters.value).forEach(([key, value]) => {
+    if (value) {
+      filtered = filtered.filter((row) => String(row[key]).toLowerCase().includes(value.toLowerCase()))
+    }
+  })
+
+  // مرتب‌سازی
+  if (sortKey.value) {
+    filtered = [...filtered].sort((a, b) => {
+      const valA = String(a[sortKey.value])
+      const valB = String(b[sortKey.value])
+      return sortOrder.value === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA)
+    })
+  }
+
+  return filtered
+})
+
+watch(
+  () => [props.data, search.value],
+  () => {
+    currentPage.value = 1
+  }
+)
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredAndSortedData.value.length / props.itemsPerPage)
+})
+
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * props.itemsPerPage
+  const end = start + props.itemsPerPage
+  return filteredAndSortedData.value.slice(start, end)
+})
+
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--
+}
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++
+}
+
+// خروجی گرفتن
+const { downloadJSON, downloadExcel } = useDownload()
+const exportJSON = () => {
+  toast.showToast('دریافت فایل با موفقیت انجام شد.', 'success')
+  downloadJSON(filteredAndSortedData.value)
+}
+const exportExcel = () => {
+  toast.showToast('دریافت فایل با موفقیت انجام شد.', 'success')
+  downloadExcel(filteredAndSortedData.value)
+}
+</script>
+
+<style scoped>
+th {
+  resize: horizontal;
+  overflow: hidden;
+}
+</style>

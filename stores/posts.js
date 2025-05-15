@@ -25,7 +25,6 @@ export const usePostStore = defineStore('post', {
     },
     async fetchPosts() {
       this.loading = true
-      this.error = null
       try {
         const response = await api.get('/posts')
         this.posts = response.data
@@ -36,6 +35,23 @@ export const usePostStore = defineStore('post', {
       } finally {
         this.loading = false
       }
+    },
+    async fetchComments(postId) {
+      try {
+        const response = await api.get('/comments', {
+          params: { postId },
+        })
+        this.comments = response.data
+      } catch (error) {
+        this.error = error
+      }
+    },
+    async updatePost(post) {
+      await api.put(`/posts/${post.id}`, post)
+    },
+    async deletePost(postId) {
+      await api.delete(`/posts/${postId}`)
+      this.posts = this.posts.filter((p) => p.id !== postId)
     },
   },
 })
