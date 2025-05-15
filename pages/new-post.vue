@@ -27,7 +27,7 @@
           class="w-full py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition"
           :disabled="hasError"
         >
-          {{ postsStore.loading ? 'در حال ارسال...' : 'ارسال پست' }}
+          {{ postsStore.isLoading ? 'در حال ارسال...' : 'ارسال پست' }}
         </Button>
       </form>
     </div>
