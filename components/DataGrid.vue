@@ -1,6 +1,5 @@
 <template>
   <div class="py-4 px-2 fixed-width overflow-auto">
-    <!-- جستجو و دکمه‌های خروجی -->
     <section class="flex-col gap-2 flex sm:flex-row items-center justify-between mb-2">
       <InputField
         type="text"
@@ -24,27 +23,27 @@
       </div>
     </section>
 
-    <!-- جدول -->
-    <div class="overflow-auto">
-      <table class="w-full border border-collapse table-fixed">
-        <thead>
-          <tr class="bg-gray-100">
-            <th class="p-2 w-[40px]">
+    <div class="overflow-auto rounded-md">
+      <table class="w-full table-fixed min-w-[700px]">
+        <thead class="border-b border-gray-200">
+          <tr class="bg-gray-50">
+            <th class="p-2 w-[30px] border-l border-gray-200">
               <input
                 type="checkbox"
                 @change="toggleAll"
                 :checked="isAllSelected"
               />
             </th>
-            <th class="p-2 min-w-[60px] w-[60px]">ردیف</th>
+            <th class="p-2 min-w-[60px] w-[60px] border-l border-gray-200">ردیف</th>
             <th
               v-for="col in columns"
               :key="col.key"
-              class="p-2 cursor-pointer select-none min-w-[120px] resize-x overflow-hidden"
+              class="p-2 cursor-pointer select-none resize-x overflow-hidden border-l border-gray-200"
+              :class="[col.key === 'title' ? 'w-[275px]' : 'w-[350px]']"
             >
-              <section class="bg-blue-500 flex gap-5">
+              <section class="flex gap-5">
                 <div
-                  class="flex justify-between items-center gap-2 bg-teal-400"
+                  class="flex justify-between items-center gap-2"
                   @click="toggleSort(col.key)"
                 >
                   <span>{{ col.label }}</span>
@@ -55,19 +54,19 @@
                 </div>
                 <InputField
                   v-model="filters[col.key]"
-                  class="w-full border border-gray-300 rounded px-1 py-0.5 text-sm"
+                  class="w-full text-sm"
                   placeholder="فیلتر"
                 />
               </section>
             </th>
-            <th class="p-2 min-w-[120px]">عملیات</th>
+            <th class="p-2 w-40">عملیات</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="(row, index) in paginatedData"
             :key="row.id"
-            class="hover:bg-gray-50 border-b border-gray-200"
+            class="hover:bg-gray-50 border-b border-gray-200 last:border-none"
           >
             <td class="p-2 text-center">
               <input
@@ -84,52 +83,53 @@
               :key="col.key"
               class="p-2 break-words"
             >
-              {{ row[col.key] }}
+              {{ col.key === 'title' ? truncateText(row[col.key], 30) : truncateText(row[col.key]) }}
             </td>
             <td class="p-2">
-              <button
-                @click="$emit('view', row)"
-                class="text-blue-500"
-              >
-                نمایش
-              </button>
-              <button
-                @click="$emit('edit', row)"
-                class="text-yellow-500 ml-2"
-              >
-                ویرایش
-              </button>
-              <button
-                @click="$emit('delete', row)"
-                class="text-red-500 ml-2"
-              >
-                حذف
-              </button>
+              <div class="flex justify-center items-center gap-1 h-full">
+                <CircleButton
+                  :icon="Edit"
+                  :iconClass="'stroke-green-700 hover:stroke-green-800'"
+                  @click="$emit('edit', row)"
+                  class="shadow bg-green-100 hover:bg-green-200"
+                />
+                <CircleButton
+                  :icon="Delete"
+                  :iconClass="'stroke-red-700 hover:stroke-red-800'"
+                  @click="$emit('delete', row)"
+                  class="shadow bg-red-100 hover:bg-red-200"
+                />
+                <CircleButton
+                  :icon="More"
+                  :iconClass="'stroke-blue-700 hover:stroke-blue-800'"
+                  @click="$emit('view', row)"
+                  class="shadow bg-blue-100 hover:bg-blue-200"
+                />
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- صفحه‌بندی -->
     <div class="flex justify-center items-center gap-2 mt-4">
       <CircleButton
-        :disabled="currentPage === 1"
         :icon="ChevronRight"
         :iconClass="'stroke-blue-700 hover:stroke-blue-800'"
         @click="prevPage"
         class="shadow bg-blue-100 hover:bg-blue-200"
+        :class="[currentPage === 1 && 'hidden']"
       />
       <CircleButton
         v-for="page in totalPages"
         :key="page"
         @click="currentPage = page"
-        :class="['', page === currentPage ? 'bg-blue-500 text-white' : 'hover:bg-gray-100']"
+        :class="[page === currentPage ? 'bg-blue-500 text-white' : 'hover:bg-gray-100']"
       >
         {{ toPersianNumber(page) }}
       </CircleButton>
       <CircleButton
-        :disabled="currentPage === totalPages"
+        :class="[currentPage === totalPages && 'hidden']"
         :icon="ChevronLeft"
         :iconClass="'stroke-blue-700 hover:stroke-blue-800'"
         @click="nextPage"
@@ -149,7 +149,9 @@ import ChevronRight from '~/assets/icons/ChevronRight.vue'
 import ChevronLeft from '~/assets/icons/ChevronLeft.vue'
 import Ascend from '~/assets/icons/Ascend.vue'
 import Descend from '~/assets/icons/Descend.vue'
-
+import Edit from '~/assets/icons/Edit.vue'
+import Delete from '~/assets/icons/Delete.vue'
+import More from '~/assets/icons/More.vue'
 const props = defineProps({
   columns: Array,
   data: Array,
