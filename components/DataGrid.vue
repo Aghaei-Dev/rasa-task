@@ -225,12 +225,14 @@ watch(itemsPerPage, () => {
   currentPage.value = 1
 })
 const totalPages = computed(() => {
-  return Math.ceil(filteredAndSortedData.value.length / itemsPerPage.value)
+  const perPage = Number(itemsPerPage.value) || 10
+  return Math.ceil(filteredAndSortedData.value.length / perPage)
 })
 
 const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
+  const perPage = Number(itemsPerPage.value) || 10
+  const start = (currentPage.value - 1) * perPage
+  const end = start + perPage
   return filteredAndSortedData.value.slice(start, end)
 })
 

@@ -2,7 +2,7 @@
   <select
     class="bg-gray-100 rounded-md text-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
     :value="modelValue"
-    @input="$emit('update:modelValue', $event.target.value)"
+    @input="$emit('update:modelValue', Number($event.target.value))"
   >
     <option
       v-for="item in array"
@@ -20,7 +20,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  modelValue: [String, Number],
+  modelValue: {
+    type: [String, Number],
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
