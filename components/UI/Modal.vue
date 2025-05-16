@@ -5,7 +5,7 @@
   >
     <div
       v-if="modalState.isVisible"
-      class="bg-gray-50 z-50 rounded-md min-w-lg transition-all duration-300"
+      class="bg-gray-50 z-50 rounded-md min-w-lg transition-all duration-300 max-h-[750px] max-w-[400px] overflow-y-auto"
       :class="modalState.type === 'confirm' ? 'p-6 fixed-up' : 'p-4 fixed-center'"
     >
       <CircleButton
