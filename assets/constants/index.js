@@ -17,3 +17,4 @@ export const sliderItems = [
   { id: 4, img: wallet, alt: 'wallet' },
   { id: 5, img: youtube, alt: 'youtube' },
 ]
+export const eachPage = [5, 10, 20, 50, 100]

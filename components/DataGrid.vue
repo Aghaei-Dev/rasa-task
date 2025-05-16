@@ -7,7 +7,11 @@
         v-model="search"
         class="w-full sm:max-w-[400px]"
       />
-      <div class="flex gap-2 w-full sm:max-w-[250px]">
+      <div class="flex gap-2 w-full sm:max-w-[350px]">
+        <SelectField
+          :array="eachPage"
+          v-model="itemsPerPage"
+        />
         <Button
           @click="exportJSON"
           full
@@ -76,7 +80,7 @@
               />
             </td>
             <td class="p-2 text-center">
-              {{ toPersianNumber(index + 1 + (currentPage - 1) * props.itemsPerPage) }}
+              {{ toPersianNumber(getRowIndex(index)) }}
             </td>
             <td
               v-for="col in columns"
@@ -152,13 +156,11 @@ import Descend from '~/assets/icons/Descend.vue'
 import Edit from '~/assets/icons/Edit.vue'
 import Delete from '~/assets/icons/Delete.vue'
 import More from '~/assets/icons/More.vue'
+import SelectField from './UI/SelectField'
+import { eachPage } from '../assets/constants'
 const props = defineProps({
   columns: Array,
   data: Array,
-  itemsPerPage: {
-    type: Number,
-    default: 10,
-  },
 })
 
 const toast = useGlobalStore()
@@ -169,6 +171,7 @@ const sortOrder = ref('asc')
 const filters = ref({})
 const selected = ref([])
 const currentPage = ref(1)
+const itemsPerPage = ref(10)
 
 const isAllSelected = computed(() => {
   return paginatedData.value.length && selected.value.length === paginatedData.value.length
@@ -218,14 +221,16 @@ watch(
     currentPage.value = 1
   }
 )
-
+watch(itemsPerPage, () => {
+  currentPage.value = 1
+})
 const totalPages = computed(() => {
-  return Math.ceil(filteredAndSortedData.value.length / props.itemsPerPage)
+  return Math.ceil(filteredAndSortedData.value.length / itemsPerPage.value)
 })
 
 const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * props.itemsPerPage
-  const end = start + props.itemsPerPage
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
   return filteredAndSortedData.value.slice(start, end)
 })
 
@@ -244,6 +249,10 @@ const exportJSON = () => {
 const exportExcel = () => {
   toast.showToast('دریافت فایل با موفقیت انجام شد.', 'success')
   downloadExcel(filteredAndSortedData.value)
+}
+
+const getRowIndex = (index) => {
+  return index + 1 + (currentPage.value - 1) * itemsPerPage.value
 }
 </script>
 

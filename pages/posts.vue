@@ -5,7 +5,6 @@
     @view="showComments"
     @edit="editPost"
     @delete="deletePostHandler"
-    :itemsPerPage="10"
     :items="postStore.posts"
   />
   <Modal>

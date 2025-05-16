@@ -62,5 +62,4 @@ const breadcrumbs = computed(() => {
 
   return crumbs
 })
-console.log(breadcrumbs)
 </script>
